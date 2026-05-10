@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0D1117" />
+    <meta name="description" content="ORION HUD, assistente IA futurista com PWA." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="ORION" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>ORION HUD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='icon-192.png') }}" />
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon-192.png') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body data-csrf-token="{{ csrf_token }}">
+    <div class="ambient" aria-hidden="true">
+      <span class="particle p1"></span>
+      <span class="particle p2"></span>
+      <span class="particle p3"></span>
+      <span class="particle p4"></span>
+      <span class="particle p5"></span>
+      <span class="particle p6"></span>
+      <span class="constellation-dot d1"></span>
+      <span class="constellation-dot d2"></span>
+      <span class="constellation-dot d3"></span>
+      <span class="constellation-dot d4"></span>
+      <span class="constellation-dot d5"></span>
+      <span class="constellation-line l1"></span>
+      <span class="constellation-line l2"></span>
+      <span class="constellation-line l3"></span>
+      <span class="constellation-line l4"></span>
+    </div>
+
+    <div class="mobile-topbar">
+      <button class="icon-button" id="menu-toggle" type="button" aria-label="Abrir menu">
+        <span></span>
+        <span></span>
+      </button>
+      <div class="brand compact">
+        <div class="orion-logo" aria-hidden="true">
+          <span class="core"></span>
+          <span class="orbit orbit-a"></span>
+          <span class="orbit orbit-b"></span>
+        </div>
+        <strong>ORION</strong>
+      </div>
+      <button class="install-chip" id="install-button-mobile" type="button" hidden>Instalar</button>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="orion-logo" aria-hidden="true">
+          <span class="core"></span>
+          <span class="orbit orbit-a"></span>
+          <span class="orbit orbit-b"></span>
+        </div>
+        <div>
+          <strong>ORION</strong>
+          <small>HUD INTERFACE V2</small>
+        </div>
+      </div>
+
+      <button class="new-chat" type="button" data-prompt="Novo chat iniciado. Como posso te ajudar hoje?">
+        <span>+</span>
+        Novo Chat
+      </button>
+
+      <nav class="side-nav" aria-label="Menu principal">
+        <button class="active" type="button" data-panel="chat">
+          <span class="nav-icon">✦</span>
+          Conversas
+        </button>
+        <button type="button" data-prompt="O que voce lembra sobre mim?">
+          <span class="nav-icon">◇</span>
+          Memória
+        </button>
+        <button type="button" data-prompt="Me ajude a transformar isso em uma tarefa organizada.">
+          <span class="nav-icon">▣</span>
+          Tarefas
+        </button>
+        <button type="button" data-prompt="Abra as configuracoes do Orion.">
+          <span class="nav-icon">⚙</span>
+          Configurações
+        </button>
+      </nav>
+
+      <button class="install-chip desktop-install" id="install-button" type="button" hidden>
+        Instalar no Android
+      </button>
+
+      <div class="profile">
+        <div class="avatar">V</div>
+        <div>
+          <strong id="profile-name">{{ user.name if user else "Visitante" }}</strong>
+          <small>{{ user.email if user else "Login opcional" }}</small>
+        </div>
+      </div>
+
+      <div class="auth-panel">
+        {% if user %}
+          <button id="logout-button" type="button">Sair</button>
+        {% else %}
+          <a class="{{ '' if auth.google else 'disabled' }}" href="{{ url_for('login', provider='google') if auth.google else '#' }}">
+            Login Google
+          </a>
+          <a class="{{ '' if auth.microsoft else 'disabled' }}" href="{{ url_for('login', provider='microsoft') if auth.microsoft else '#' }}">
+            Login Microsoft
+          </a>
+        {% endif %}
+      </div>
+    </aside>
+
+    <main class="hud-layout">
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <p class="eyebrow">SISTEMA ONLINE</p>
+          <h1>Olá, eu sou o Orion.</h1>
+          <p>Como posso te ajudar hoje?</p>
+        </div>
+        <div class="orbital-status" aria-hidden="true">
+          <div class="ring ring-one"></div>
+          <div class="ring ring-two"></div>
+          <div class="energy-core"></div>
+        </div>
+      </section>
+
+      <section class="action-grid" aria-label="Ações rápidas">
+        <button class="action-card" type="button" data-prompt="Resuma este texto de forma clara e objetiva: ">
+          <span>01</span>
+          <strong>Resumir texto</strong>
+          <small>Transforme conteúdo extenso em pontos essenciais.</small>
+        </button>
+        <button class="action-card" type="button" data-prompt="Crie um conteúdo sobre: ">
+          <span>02</span>
+          <strong>Criar conteúdo</strong>
+          <small>Ideias, roteiros, posts, textos e estratégias.</small>
+        </button>
+        <button class="action-card" type="button" data-prompt="Analise estas informações e me diga os pontos principais: ">
+          <span>03</span>
+          <strong>Analisar informações</strong>
+          <small>Organize dados, sinais, decisões e possibilidades.</small>
+        </button>
+        <button class="action-card" type="button" data-prompt="Me ajude a realizar esta tarefa passo a passo: ">
+          <span>04</span>
+          <strong>Realizar tarefas</strong>
+          <small>Planeje, divida etapas e acompanhe a execução.</small>
+        </button>
+      </section>
+
+      <section class="chat-panel">
+        <div class="chat-header">
+          <div>
+            <span class="pulse"></span>
+            Núcleo conversacional ativo
+          </div>
+          <small id="source-label">ORION IA</small>
+        </div>
+
+        <section id="messages" class="messages" aria-live="polite">
+          <article class="message assistant fade-in">
+            <div class="message-mark">
+              <div class="mini-logo"></div>
+            </div>
+            <div class="bubble">
+              Interface HUD V2 inicializada. Envie uma mensagem ou escolha um card para começar.
+            </div>
+          </article>
+        </section>
+
+        <form id="chat-form" class="composer">
+          <input id="user-id" value="vitor" aria-label="Usuário" autocomplete="off" />
+          <div class="input-shell">
+            <input
+              id="message"
+              aria-label="Mensagem"
+              autocomplete="off"
+              placeholder="Pergunte qualquer coisa..."
+              maxlength="1000"
+              required
+            />
+            <button id="send-button" type="submit" aria-label="Enviar mensagem">
+              <span>➜</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegação inferior">
+      <button class="active" type="button" data-panel="chat">Chat</button>
+      <button type="button" data-prompt="Mostre minhas conversas recentes.">Conversas</button>
+      <button type="button" data-prompt="Me ajude a organizar minhas tarefas.">Tarefas</button>
+      <button type="button" data-prompt="Abrir configuracoes do Orion.">Configurações</button>
+    </nav>
+
+    <p class="signature">created by lava_rip2012</p>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
