@@ -55,8 +55,19 @@ def orion_v111_patch(response):
 .logo.large { width: 48px; height: 48px; }
 </style>
 """
+        script = """
+<script id="orion-v111-ui-patch">
+window.addEventListener('load', function () {
+  var kicker = document.getElementById('view-kicker');
+  if (kicker) kicker.textContent = 'ORION V1.1.1 ONLINE';
+  document.title = 'ORION V1.1.1';
+});
+</script>
+"""
         if "orion-v111-logo-patch" not in html:
             html = html.replace("</head>", f"{style}</head>")
+        if "orion-v111-ui-patch" not in html:
+            html = html.replace("</body>", f"{script}</body>")
         response.set_data(html)
         response.headers["Content-Length"] = str(len(response.get_data()))
     return response
