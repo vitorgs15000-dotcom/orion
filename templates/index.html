@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   </head>
   <body data-csrf-token="{{ csrf_token }}" data-user-id="{{ user.email if user else 'guest' }}">
-    <div class="space-field" aria-hidden="true">
+    <div class="backdrop" aria-hidden="true">
       <span></span><span></span><span></span><span></span><span></span>
     </div>
 
@@ -24,13 +24,16 @@
       <button class="hamburger" id="menu-toggle" type="button" aria-label="Abrir menu">
         <span></span><span></span>
       </button>
-      <div class="mobile-brand"><span class="logo"></span><b>ORION</b></div>
+      <div class="mobile-brand">
+        <img class="logo" src="{{ url_for('static', filename='icon-192.png') }}" alt="Logo Orion" />
+        <b>ORION</b>
+      </div>
       <button class="install-button" id="install-button-mobile" type="button" hidden>Instalar</button>
     </header>
 
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <span class="logo large"></span>
+        <img class="logo large" src="{{ url_for('static', filename='icon-192.png') }}" alt="Logo Orion" />
         <div>
           <strong>ORION</strong>
           <small>V1.1 Foundation</small>
@@ -39,11 +42,11 @@
 
       <button class="primary-action" id="new-chat" type="button">Novo Chat</button>
 
-      <nav class="nav-list" aria-label="Navegação Orion">
+      <nav class="nav-list" aria-label="NavegaÃ§Ã£o Orion">
         <button class="active" type="button" data-view="chat">Conversas</button>
-        <button type="button" data-view="memory">Memória</button>
+        <button type="button" data-view="memory">MemÃ³ria</button>
         <button type="button" data-view="tasks">Tarefas</button>
-        <button type="button" data-view="settings">Configurações</button>
+        <button type="button" data-view="settings">ConfiguraÃ§Ãµes</button>
       </nav>
 
       <section class="auth-card">
@@ -69,16 +72,16 @@
       <section class="hero">
         <div>
           <p class="eyebrow" id="view-kicker">ORION V1.1 ONLINE</p>
-          <h1 id="view-title">Olá, eu sou o Orion.</h1>
+          <h1 id="view-title">OlÃ¡, eu sou o Orion.</h1>
           <p id="view-subtitle">Como posso te ajudar hoje?</p>
         </div>
-        <div class="orion-sigil" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="constellation" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       </section>
 
       <section class="quick-grid" id="quick-grid">
         <button type="button" data-prompt="Resuma este texto de forma objetiva: ">Resumir texto</button>
-        <button type="button" data-prompt="Crie um conteúdo sobre: ">Criar conteúdo</button>
-        <button type="button" data-prompt="Analise estas informações: ">Analisar informações</button>
+        <button type="button" data-prompt="Crie um conteÃºdo sobre: ">Criar conteÃºdo</button>
+        <button type="button" data-prompt="Analise estas informaÃ§Ãµes: ">Analisar informaÃ§Ãµes</button>
         <button type="button" data-prompt="Me ajude a realizar esta tarefa: ">Realizar tarefas</button>
       </section>
 
@@ -87,35 +90,58 @@
 
         <section class="chat-card" id="chat-card">
           <div class="chat-top">
-            <span><b></b>Núcleo conversacional</span>
+            <span><b></b>NÃºcleo conversacional</span>
             <small id="source-label">ORION IA</small>
           </div>
 
           <section id="messages" class="messages" aria-live="polite">
             <article class="message assistant entering">
-              <div class="bubble">Orion online. Interface V1.1 carregada e estável.</div>
+              <div class="bubble">Orion online. Interface V1.1 carregada, estavel e com calculo seguro.</div>
             </article>
           </section>
 
           <form id="chat-form" class="composer">
-            <input id="user-id" value="{{ user.email if user else 'guest' }}" aria-label="Usuário" autocomplete="off" />
+            <input id="user-id" value="{{ user.email if user else 'guest' }}" aria-label="UsuÃ¡rio" autocomplete="off" />
             <div class="prompt-box">
               <input id="message" aria-label="Mensagem" autocomplete="off" placeholder="Pergunte qualquer coisa..." maxlength="1000" required />
-              <button id="send-button" type="submit" aria-label="Enviar">➜</button>
+              <button id="send-button" type="submit" aria-label="Enviar">âžœ</button>
             </div>
           </form>
         </section>
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Navegação inferior">
+    <nav class="bottom-nav" aria-label="NavegaÃ§Ã£o inferior">
       <button class="active" type="button" data-view="chat">Chat</button>
       <button type="button" data-view="conversations">Conversas</button>
       <button type="button" data-view="tasks">Tarefas</button>
-      <button type="button" data-view="settings">Configurações</button>
+      <button type="button" data-view="settings">ConfiguraÃ§Ãµes</button>
     </nav>
+
+    <section class="orb-panel" id="orb-panel" aria-label="Mini assistente Orion" hidden>
+      <header>
+        <span class="orb-mini"></span>
+        <div>
+          <strong>ORION</strong>
+          <small>assistente compacto</small>
+        </div>
+        <button id="orb-close" type="button" aria-label="Minimizar mini chat">x</button>
+      </header>
+      <div class="orb-messages" id="orb-messages">
+        <article class="orb-message assistant">Orion online. Painel rapido ativo.</article>
+      </div>
+      <form class="orb-form" id="orb-form">
+        <input id="orb-input" autocomplete="off" maxlength="1000" placeholder="Pergunte ao Orion..." />
+        <button type="submit" aria-label="Enviar no mini chat">></button>
+      </form>
+    </section>
+
+    <button class="orion-orb" id="orion-orb" type="button" aria-label="Abrir mini assistente Orion">
+      <span></span>
+    </button>
 
     <p class="signature">created by lava_rip2012</p>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
   </body>
 </html>
+

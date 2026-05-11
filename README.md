@@ -1,6 +1,6 @@
-# ORION V1.1 — Foundation Update
+﻿# ORION V1.1 â€” Foundation Update
 
-Assistente IA web futurista com Flask, Groq, OAuth Google/Microsoft, memoria JSON, SPA, PWA e deploy pronto para Render.
+Assistente IA web futurista com Flask, Groq, OAuth Google/Microsoft, memoria JSON, calculo seguro, SPA, PWA e deploy pronto para Render.
 
 ## Iniciar localmente
 
@@ -70,7 +70,8 @@ Abra a URL HTTPS do Render no Chrome Android e escolha instalar/adicionar a tela
 
 ## Atualizar o Orion
 
-1. Edite arquivos em `templates/`, `static/` ou serviços Python.
+1. Edite arquivos em `templates/`, `static/` ou serviÃ§os Python.
 2. Teste localmente.
-3. Faça commit e push para o GitHub.
+3. FaÃ§a commit e push para o GitHub.
 4. O Render redeploya automaticamente se estiver conectado ao repositorio.
+

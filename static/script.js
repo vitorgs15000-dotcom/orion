@@ -1,7 +1,8 @@
-const state = {
+﻿const state = {
   currentView: "chat",
   tasks: loadTasks(),
   animations: localStorage.getItem("orion-animations") !== "off",
+  voice: localStorage.getItem("orion-voice") === "on",
   deferredInstallPrompt: null,
 };
 
@@ -22,6 +23,12 @@ const viewKicker = document.querySelector("#view-kicker");
 const viewTitle = document.querySelector("#view-title");
 const viewSubtitle = document.querySelector("#view-subtitle");
 const logoutButton = document.querySelector("#logout-button");
+const orb = document.querySelector("#orion-orb");
+const orbPanel = document.querySelector("#orb-panel");
+const orbClose = document.querySelector("#orb-close");
+const orbForm = document.querySelector("#orb-form");
+const orbInput = document.querySelector("#orb-input");
+const orbMessages = document.querySelector("#orb-messages");
 const installButtons = [
   document.querySelector("#install-button"),
   document.querySelector("#install-button-mobile"),
@@ -108,6 +115,10 @@ form.addEventListener("submit", async (event) => {
   await sendMessage(message);
 });
 
+if (orb && orbPanel) {
+  initOrbOverlay();
+}
+
 function setView(view) {
   state.currentView = view === "conversations" ? "conversations" : view;
   sidebar.classList.remove("open");
@@ -141,7 +152,7 @@ function showPanel(title, subtitle, kicker = "ORION V1.1") {
 
 function renderChatView() {
   viewKicker.textContent = "ORION V1.1 ONLINE";
-  viewTitle.textContent = "Olá, eu sou o Orion.";
+  viewTitle.textContent = "OlÃ¡, eu sou o Orion.";
   viewSubtitle.textContent = "Como posso te ajudar hoje?";
   quickGrid.hidden = false;
   spaPanel.hidden = true;
@@ -150,13 +161,13 @@ function renderChatView() {
 }
 
 async function renderConversationsView() {
-  showPanel("Conversas", "Histórico recente do núcleo conversacional.");
+  showPanel("Conversas", "HistÃ³rico recente do nÃºcleo conversacional.");
   const data = await loadMemory();
   const history = data.history || [];
   spaPanel.innerHTML = `
     <div class="panel-head">
       <strong>${history.length} registros</strong>
-      <button class="ghost-button" data-clear-history>Limpar histórico</button>
+      <button class="ghost-button" data-clear-history>Limpar histÃ³rico</button>
     </div>
     <div class="list">${history.length ? history.map(renderHistoryItem).join("") : emptyState("Nenhuma conversa registrada ainda.")}</div>
   `;
@@ -164,7 +175,7 @@ async function renderConversationsView() {
 }
 
 async function renderMemoryView() {
-  showPanel("Memória", "Informações salvas para manter continuidade.");
+  showPanel("MemÃ³ria", "InformaÃ§Ãµes salvas para manter continuidade.");
   const data = await loadMemory();
   const profile = data.profile || {};
   const entries = Object.entries(profile);
@@ -174,7 +185,7 @@ async function renderMemoryView() {
       <input name="value" placeholder="valor, exemplo: criar o Orion" maxlength="300" required />
       <button type="submit">Salvar</button>
     </form>
-    <div class="list">${entries.length ? entries.map(renderMemoryItem).join("") : emptyState("Nenhuma memória salva.")}</div>
+    <div class="list">${entries.length ? entries.map(renderMemoryItem).join("") : emptyState("Nenhuma memÃ³ria salva.")}</div>
   `;
   spaPanel.querySelector("#memory-form").addEventListener("submit", saveMemoryFact);
   spaPanel.querySelectorAll("[data-forget]").forEach((button) => {
@@ -183,7 +194,7 @@ async function renderMemoryView() {
 }
 
 function renderTasksView() {
-  showPanel("Tarefas", "Organize execução sem sair do Orion.");
+  showPanel("Tarefas", "Organize execuÃ§Ã£o sem sair do Orion.");
   spaPanel.innerHTML = `
     <form class="inline-form" id="task-form">
       <input name="task" placeholder="Nova tarefa..." maxlength="160" required />
@@ -201,28 +212,41 @@ function renderTasksView() {
 }
 
 function renderSettingsView() {
-  showPanel("Configurações", "Controle local da interface e informações do sistema.");
+  showPanel("ConfiguraÃ§Ãµes", "Controle local da interface e informaÃ§Ãµes do sistema.");
   spaPanel.innerHTML = `
     <div class="settings-grid">
       <button class="setting-card" data-toggle-animations>
-        <strong>Animações</strong>
+        <strong>AnimaÃ§Ãµes</strong>
         <small>${state.animations ? "Ativadas" : "Desativadas"}</small>
       </button>
+      <button class="setting-card" data-toggle-voice>
+        <strong>Voz Orion</strong>
+        <small>${voiceSupported() ? (state.voice ? "Ativada" : "Desativada") : "Indisponivel neste navegador"}</small>
+      </button>
       <button class="setting-card" data-clear-history>
-        <strong>Limpar histórico</strong>
+        <strong>Limpar histÃ³rico</strong>
         <small>Remove registros locais do chat no servidor.</small>
       </button>
       <div class="setting-card">
         <strong>ORION V1.1</strong>
-        <small>Foundation Update. Seguro, PWA, Groq, OAuth e HUD responsivo.</small>
+        <small>Foundation Update. Seguro, PWA, Groq, OAuth, calculo seguro e HUD responsivo.</small>
       </div>
       <div class="setting-card">
         <strong>Login</strong>
-        <small>Google/Microsoft são ativados via variáveis OAuth no Render.</small>
+        <small>Google/Microsoft sÃ£o ativados via variÃ¡veis OAuth no Render.</small>
+      </div>
+      <div class="setting-card">
+        <strong>Orb Android</strong>
+        <small>No PWA a orb funciona dentro do app. Para aparecer com o app fechado, o Orion precisa virar app Android nativo com permissao de sobreposicao.</small>
+      </div>
+      <div class="setting-card">
+        <strong>Voz original</strong>
+        <small>Voz sintetica tecnologica do Orion, sem copiar vozes de personagens ou atores.</small>
       </div>
     </div>
   `;
   spaPanel.querySelector("[data-toggle-animations]").addEventListener("click", toggleAnimations);
+  spaPanel.querySelector("[data-toggle-voice]").addEventListener("click", toggleVoice);
   spaPanel.querySelector("[data-clear-history]").addEventListener("click", clearHistory);
 }
 
@@ -239,16 +263,35 @@ async function sendMessage(message) {
     });
     thinking.classList.remove("thinking");
     bubble.textContent = data.reply || data.error || "Orion nao conseguiu responder agora.";
+    speakOrion(bubble.textContent);
     sourceLabel.textContent = data.source ? data.source.toUpperCase() : "ORION";
   } catch (_error) {
     thinking.classList.remove("thinking");
-    bubble.textContent = "Conexão instável. Tente novamente em instantes.";
+    bubble.textContent = "ConexÃ£o instÃ¡vel. Tente novamente em instantes.";
     sourceLabel.textContent = "OFFLINE";
   } finally {
     sendButton.disabled = false;
     messageInput.focus();
     scrollMessages();
   }
+}
+
+async function sendOverlayMessage(message) {
+  addOrbMessage(message, "user");
+  const thinking = addOrbMessage("Orion pensando...", "assistant thinking");
+  try {
+    const data = await api("/chat", {
+      method: "POST",
+      body: JSON.stringify({ user_id: userInput.value || defaultUserId, message }),
+    });
+    thinking.classList.remove("thinking");
+    thinking.textContent = data.reply || data.error || "Orion nao conseguiu responder agora.";
+    speakOrion(thinking.textContent);
+  } catch (_error) {
+    thinking.classList.remove("thinking");
+    thinking.textContent = "Conexao instavel. Tente novamente.";
+  }
+  scrollOrbMessages();
 }
 
 function addMessage(text, type, extraClass = "") {
@@ -267,6 +310,98 @@ function scrollMessages() {
   requestAnimationFrame(() => {
     messages.scrollTop = messages.scrollHeight;
   });
+}
+
+function initOrbOverlay() {
+  let drag = null;
+  const saved = loadOrbPosition();
+  if (saved) {
+    orb.style.left = `${saved.x}px`;
+    orb.style.top = `${saved.y}px`;
+    orb.style.right = "auto";
+    orb.style.bottom = "auto";
+  }
+
+  orb.addEventListener("click", () => {
+    if (drag?.moved) return;
+    orbPanel.hidden = !orbPanel.hidden;
+    if (!orbPanel.hidden) orbInput.focus();
+  });
+
+  orbClose?.addEventListener("click", () => {
+    orbPanel.hidden = true;
+  });
+
+  orbForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const message = orbInput.value.trim();
+    if (!message) return;
+    orbInput.value = "";
+    await sendOverlayMessage(message);
+  });
+
+  orb.addEventListener("pointerdown", (event) => {
+    drag = {
+      startX: event.clientX,
+      startY: event.clientY,
+      left: orb.offsetLeft,
+      top: orb.offsetTop,
+      moved: false,
+    };
+    orb.setPointerCapture(event.pointerId);
+  });
+
+  orb.addEventListener("pointermove", (event) => {
+    if (!drag) return;
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    if (Math.abs(dx) + Math.abs(dy) > 8) drag.moved = true;
+    const x = clamp(drag.left + dx, 8, window.innerWidth - orb.offsetWidth - 8);
+    const y = clamp(drag.top + dy, 8, window.innerHeight - orb.offsetHeight - 8);
+    orb.style.left = `${x}px`;
+    orb.style.top = `${y}px`;
+    orb.style.right = "auto";
+    orb.style.bottom = "auto";
+  });
+
+  orb.addEventListener("pointerup", () => {
+    if (!drag) return;
+    saveOrbPosition(orb.offsetLeft, orb.offsetTop);
+    setTimeout(() => {
+      drag = null;
+    }, 0);
+  });
+}
+
+function addOrbMessage(text, type) {
+  const item = document.createElement("article");
+  item.className = `orb-message ${type}`;
+  item.textContent = text;
+  orbMessages.appendChild(item);
+  scrollOrbMessages();
+  return item;
+}
+
+function scrollOrbMessages() {
+  requestAnimationFrame(() => {
+    orbMessages.scrollTop = orbMessages.scrollHeight;
+  });
+}
+
+function loadOrbPosition() {
+  try {
+    return JSON.parse(localStorage.getItem("orion-orb-position") || "null");
+  } catch (_error) {
+    return null;
+  }
+}
+
+function saveOrbPosition(x, y) {
+  localStorage.setItem("orion-orb-position", JSON.stringify({ x, y }));
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
 async function api(path, options = {}) {
@@ -317,7 +452,7 @@ async function clearHistory() {
     body: JSON.stringify({ user_id: userInput.value || defaultUserId }),
   });
   messages.innerHTML = "";
-  addMessage("Histórico limpo. Núcleo pronto para uma nova sequência.", "assistant");
+  addMessage("HistÃ³rico limpo. NÃºcleo pronto para uma nova sequÃªncia.", "assistant");
   if (state.currentView === "conversations") renderConversationsView();
 }
 
@@ -362,8 +497,53 @@ function toggleAnimations() {
   renderSettingsView();
 }
 
+function toggleVoice() {
+  if (!voiceSupported()) return;
+  state.voice = !state.voice;
+  localStorage.setItem("orion-voice", state.voice ? "on" : "off");
+  if (state.voice) {
+    speakOrion("Orion online. Voz sintetica ativada.");
+  } else {
+    window.speechSynthesis.cancel();
+  }
+  renderSettingsView();
+}
+
+function voiceSupported() {
+  return "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+}
+
+function speakOrion(text) {
+  if (!state.voice || !voiceSupported()) return;
+  const cleanText = String(text || "")
+    .replace(/\s+/g, " ")
+    .replace(/[<>]/g, "")
+    .trim()
+    .slice(0, 420);
+  if (!cleanText) return;
+
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  const voices = window.speechSynthesis.getVoices();
+  utterance.voice = pickOrionVoice(voices);
+  utterance.lang = utterance.voice?.lang || "pt-BR";
+  utterance.rate = 0.92;
+  utterance.pitch = 0.82;
+  utterance.volume = 0.92;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
+function pickOrionVoice(voices) {
+  const preferred = voices.find((voice) => /pt-BR/i.test(voice.lang) && /male|mascul/i.test(voice.name));
+  return preferred
+    || voices.find((voice) => /pt-BR/i.test(voice.lang))
+    || voices.find((voice) => /pt/i.test(voice.lang))
+    || voices[0]
+    || null;
+}
+
 function renderHistoryItem(item) {
-  return `<article class="data-row ${item.role === "user" ? "is-user" : ""}"><strong>${item.role === "user" ? "Você" : "Orion"}</strong><span>${escapeHtml(item.content || "")}</span></article>`;
+  return `<article class="data-row ${item.role === "user" ? "is-user" : ""}"><strong>${item.role === "user" ? "VocÃª" : "Orion"}</strong><span>${escapeHtml(item.content || "")}</span></article>`;
 }
 
 function renderMemoryItem([key, value]) {
@@ -371,7 +551,7 @@ function renderMemoryItem([key, value]) {
 }
 
 function renderTaskItem(task) {
-  return `<article class="data-row ${task.done ? "done" : ""}"><strong>${escapeHtml(task.title)}</strong><span>${task.done ? "Concluída" : "Pendente"}</span><button data-toggle-task="${task.id}">${task.done ? "Reabrir" : "Concluir"}</button><button data-remove-task="${task.id}">Remover</button></article>`;
+  return `<article class="data-row ${task.done ? "done" : ""}"><strong>${escapeHtml(task.title)}</strong><span>${task.done ? "ConcluÃ­da" : "Pendente"}</span><button data-toggle-task="${task.id}">${task.done ? "Reabrir" : "Concluir"}</button><button data-remove-task="${task.id}">Remover</button></article>`;
 }
 
 function emptyState(text) {
@@ -388,3 +568,4 @@ function escapeHtml(value) {
 }
 
 renderChatView();
+

@@ -1,1 +1,26 @@
-{}
+{
+  "system": {
+    "creator": {
+      "main_user": "lava_rip2012",
+      "role": "Criador do Orion",
+      "project_age": "Projeto Orion em desenvolvimento ha aproximadamente 1 mes.",
+      "public_identity": "lava_rip2012 e o criador do Orion e deve ser reconhecido quando perguntarem quem criou o assistente."
+    }
+  },
+  "users": {
+    "guest": {
+      "personal": {},
+      "knowledge": {},
+      "history": [
+        {
+          "role": "user",
+          "content": "quem criou o orion?"
+        },
+        {
+          "role": "assistant",
+          "content": "Fui criado por lava_rip2012, o usuario principal e criador do projeto Orion. O Orion esta em desenvolvimento ha aproximadamente 1 mes, evoluindo como um assistente IA web futurista, pessoal e cada vez mais inteligente."
+        }
+      ]
+    }
+  }
+}

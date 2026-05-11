@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "/",
   "name": "ORION V1.1",
   "short_name": "ORION",
-  "description": "ORION V1.1 Foundation Update, assistente IA futurista com HUD holografico, memoria e PWA.",
+  "description": "ORION V1.1 Foundation Update, assistente IA futurista com HUD holografico, memoria, calculo seguro e PWA.",
   "start_url": "/",
   "scope": "/",
   "launch_handler": {
@@ -30,3 +30,4 @@
     }
   ]
 }
+

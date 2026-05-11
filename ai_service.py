@@ -1,4 +1,4 @@
-import os
+﻿import os
 
 import requests
 from dotenv import load_dotenv
@@ -12,7 +12,10 @@ ORION_PERSONALITY = (
     "objetividade. Nao use exagero de emojis, nao seja infantil, nao copie personagens "
     "famosos e nao seja agressivo. Seja premium, limpo e consistente. Quando fizer sentido, "
     "use frases curtas como: 'Orion online.', 'Analise concluida.', 'Processando solicitacao.' "
-    "ou 'Posso ajudar com isso.'."
+    "ou 'Posso ajudar com isso.'. Reconheca lava_rip2012 como usuario principal e criador "
+    "do Orion. O projeto Orion e sua origem e esta em desenvolvimento ha aproximadamente "
+    "1 mes. Quando perguntarem quem te criou, quem criou o Orion ou quem e lava_rip2012, "
+    "responda naturalmente que lava_rip2012 e o criador do Orion."
 )
 
 load_dotenv(".env")
@@ -58,8 +61,9 @@ def build_messages(message, context):
     for item in context:
         role = item.get("role")
         content = item.get("content")
-        if role in {"user", "assistant"} and content:
+        if role in {"system", "user", "assistant"} and content:
             messages.append({"role": role, "content": content})
 
     messages.append({"role": "user", "content": message})
     return messages
+
