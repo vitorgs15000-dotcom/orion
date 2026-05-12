@@ -1,0 +1,42 @@
+{
+  "system": {
+    "creator": {
+      "main_user": "lava_rip2012",
+      "role": "Criador do ORION Legacy Edition",
+      "project_age": "Projeto ORION Legacy Edition em desenvolvimento há aproximadamente 1 mês.",
+      "public_identity": "lava_rip2012 é o criador do ORION Legacy Edition."
+    }
+  },
+  "users": {
+    "teste": {
+      "personal": {},
+      "knowledge": {},
+      "history": [
+        {
+          "role": "user",
+          "content": "quanto é 9+9"
+        },
+        {
+          "role": "assistant",
+          "content": "Análise concluída. 9+9 = 18."
+        },
+        {
+          "role": "user",
+          "content": "quem te criou?"
+        },
+        {
+          "role": "assistant",
+          "content": "Fui criado por lava_rip2012, o usuário principal e criador do projeto ORION Legacy Edition. O ORION Legacy Edition está em desenvolvimento há aproximadamente 1 mês, evoluindo como um assistente IA web futurista, pessoal e cada vez mais inteligente."
+        },
+        {
+          "role": "user",
+          "content": "calcule 99999999999999999999**9"
+        },
+        {
+          "role": "assistant",
+          "content": "Ainda não encontrei uma resposta confiável. Posso tentar de novo com mais contexto, consultar minha base local ou registrar uma informação nova."
+        }
+      ]
+    }
+  }
+}

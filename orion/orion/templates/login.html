@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0D1117" />
+    <title>ORION Legacy Edition - Acesso privado</title>
+    <link rel="icon" href="{{ url_for('static', filename='icon-192.png') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body class="login-body">
+    <div class="backdrop" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <main class="login-shell">
+      <section class="login-card">
+        <img class="logo large" src="{{ url_for('static', filename='icon-192.png') }}" alt="Logo Orion" />
+        <p class="eyebrow">ORION Legacy Edition</p>
+        <h1>Acesso privado</h1>
+        <p>Assistente pessoal de lava_rip2012 e família.</p>
+
+        {% if error %}
+          <div class="login-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('private_login_post') }}" class="login-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+          <label>
+            Usuário
+            <input name="username" autocomplete="username" required />
+          </label>
+          <label>
+            Senha
+            <input name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit">Entrar</button>
+        </form>
+
+        <small>Credenciais protegidas por variáveis do servidor.</small>
+      </section>
+    </main>
+
+    <p class="signature">created by lava_rip2012</p>
+  </body>
+</html>

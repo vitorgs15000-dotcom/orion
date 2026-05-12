@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: orion
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: AUTH_REQUIRED
+        value: "true"
+      - key: GROQ_MODEL
+        value: llama-3.1-8b-instant
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ORION_USERNAME
+        sync: false
+      - key: ORION_PASSWORD
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: MICROSOFT_CLIENT_ID
+        sync: false
+      - key: MICROSOFT_CLIENT_SECRET
+        sync: false
