@@ -17,6 +17,45 @@ sys.modules["orion_root_app"] = module
 spec.loader.exec_module(module)
 app = module.app
 
+TEXT_REPLACEMENTS = {
+    "ORION V1.1": "ORION Legacy Edition",
+    "ORION LEGACY": "ORION Legacy Edition",
+    "ORION IA": "ORION Legacy IA",
+    "Navega????o": "Navega??o",
+    "Mem??ria": "Mem?ria",
+    "Configura????es": "Configura??es",
+    "Ol??": "Ol?",
+    "conte??do": "conte?do",
+    "informa????es": "informa??es",
+    "N??cleo": "N?cleo",
+    "Edi????o": "Edi??o",
+    "mem??ria": "mem?ria",
+    "c??lculo": "c?lculo",
+    "Usu??rio": "Usu?rio",
+    "r??pido": "r?pido",
+    "hist??rico": "hist?rico",
+    "Hist??rico": "Hist?rico",
+    "execu????o": "execu??o",
+    "Informa????es": "Informa??es",
+    "Anima????es": "Anima??es",
+    "Indispon??vel": "Indispon?vel",
+    "Vers??o": "Vers?o",
+    "fam??lia": "fam?lia",
+    "h??": "h?",
+    "m??s": "m?s",
+    "s??o": "s?o",
+    "instal??vel": "instal?vel",
+    "Sobreposi????o": "Sobreposi??o",
+    "Conex??o": "Conex?o",
+    "est??vel": "est?vel",
+    "sequ??ncia": "sequ?ncia",
+    "sint??tica": "sint?tica",
+    "Voc??": "Voc?",
+    "Conclu??da": "Conclu?da",
+    "???": "?",
+    "???": "?",
+}
+
 
 def private_auth_enabled():
     return os.getenv("AUTH_REQUIRED", "false").lower() == "true"
@@ -39,7 +78,6 @@ def private_user():
 def orion_private_gate():
     session.permanent = True
     session.setdefault("csrf_token", secrets.token_urlsafe(32))
-
     if not private_auth_enabled():
         return None
     if session.get("private_user") or session.get("user"):
@@ -53,6 +91,21 @@ def orion_private_gate():
     return jsonify({"error": "authentication required"}), 401
 
 
+@app.after_request
+def orion_legacy_text_filter(response):
+    content_type = response.headers.get("Content-Type", "")
+    if any(kind in content_type for kind in ("text/html", "javascript", "application/json")):
+        try:
+            text = response.get_data(as_text=True)
+            for old, new in TEXT_REPLACEMENTS.items():
+                text = text.replace(old, new)
+            response.set_data(text)
+            response.headers["Content-Length"] = str(len(response.get_data()))
+        except Exception:
+            pass
+    return response
+
+
 LOGIN_TEMPLATE = """
 <!doctype html>
 <html lang="pt-BR">
@@ -60,7 +113,7 @@ LOGIN_TEMPLATE = """
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#0D1117" />
-    <title>ORION LEGACY - Acesso privado</title>
+    <title>ORION Legacy Edition - Acesso privado</title>
     <link rel="icon" href="/static/icon-192.png" />
     <style>
       :root { color-scheme: dark; font-family: Inter, Segoe UI, Arial, sans-serif; }
@@ -68,35 +121,33 @@ LOGIN_TEMPLATE = """
       body { min-height: 100vh; min-height: 100dvh; margin: 0; display: grid; place-items: center; padding: 20px; color: #F5F7FA; background: radial-gradient(circle at 20% 15%, rgba(0,229,255,.16), transparent 28%), radial-gradient(circle at 85% 20%, rgba(123,47,255,.15), transparent 30%), #0D1117; }
       .card { width: min(430px, 100%); display: grid; gap: 14px; padding: 28px; border: 1px solid rgba(0,229,255,.22); border-radius: 26px; background: rgba(26,31,43,.78); box-shadow: inset 0 0 44px rgba(0,140,255,.06), 0 28px 90px rgba(0,0,0,.34); backdrop-filter: blur(18px); }
       img { width: 54px; height: 54px; border-radius: 50%; border: 1px solid rgba(0,229,255,.7); box-shadow: 0 0 18px rgba(0,229,255,.28); }
-      h1, p { margin: 0; }
-      h1 { letter-spacing: 0; }
-      p, small { color: rgba(245,247,250,.68); }
+      h1, p { margin: 0; } p, small { color: rgba(245,247,250,.68); }
       .eyebrow { color: #00E5FF; font-size: 12px; font-weight: 900; }
       form { display: grid; gap: 12px; }
       label { display: grid; gap: 7px; color: rgba(245,247,250,.72); font-size: 13px; font-weight: 800; }
       input { width: 100%; min-height: 50px; border: 1px solid rgba(0,229,255,.2); border-radius: 15px; padding: 0 14px; color: #F5F7FA; background: rgba(13,17,23,.78); outline: none; font-size: 16px; }
       input:focus { border-color: rgba(0,229,255,.7); box-shadow: 0 0 0 3px rgba(0,229,255,.08); }
       button { min-height: 50px; border: 0; border-radius: 15px; color: #0D1117; background: #00E5FF; box-shadow: 0 0 24px rgba(0,229,255,.28); cursor: pointer; font-weight: 900; font-size: 16px; }
-      .error { padding: 12px; border: 1px solid rgba(255,86,132,.36); border-radius: 14px; color: #ffd6e0; background: rgba(255,86,132,.1); }
-      .sig { position: fixed; right: 16px; bottom: 10px; color: rgba(0,229,255,.34); font-size: 11px; }
+      .error { padding: 12px; border: 1px solid rgba(255,86,86,.35); border-radius: 14px; color: #ffd9d9; background: rgba(255,86,86,.10); }
+      .signature { position: fixed; right: 16px; bottom: 12px; color: rgba(0,229,255,.42); font-size: 11px; text-shadow: 0 0 12px rgba(0,229,255,.28); }
     </style>
   </head>
   <body>
     <main class="card">
       <img src="/static/icon-192.png" alt="Logo Orion" />
-      <p class="eyebrow">ORION LEGACY</p>
+      <p class="eyebrow">ORION Legacy Edition</p>
       <h1>Acesso privado</h1>
-      <p>Assistente pessoal de lava_rip2012 e família.</p>
+      <p>Assistente pessoal de lava_rip2012 e fam?lia.</p>
       {% if error %}<div class="error">{{ error }}</div>{% endif %}
       <form method="post" action="{{ url_for('orion_private_login_post') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-        <label>Usuário<input name="username" autocomplete="username" required /></label>
+        <label>Usu?rio<input name="username" autocomplete="username" required /></label>
         <label>Senha<input name="password" type="password" autocomplete="current-password" required /></label>
         <button type="submit">Entrar</button>
       </form>
-      <small>Credenciais protegidas por variáveis do servidor.</small>
+      <small>Credenciais protegidas por vari?veis do servidor.</small>
     </main>
-    <p class="sig">created by lava_rip2012</p>
+    <p class="signature">created by lava_rip2012</p>
   </body>
 </html>
 """
@@ -105,83 +156,31 @@ LOGIN_TEMPLATE = """
 @app.get("/private-login")
 def orion_private_login():
     session.setdefault("csrf_token", secrets.token_urlsafe(32))
-    return render_template_string(
-        LOGIN_TEMPLATE,
-        csrf_token=session["csrf_token"],
-        error=request.args.get("error"),
-    )
+    return render_template_string(LOGIN_TEMPLATE, error=None, csrf_token=session["csrf_token"])
 
 
 @app.post("/private-login")
 def orion_private_login_post():
-    token = request.form.get("csrf_token", "")
-    expected = session.get("csrf_token", "")
-    if not token or not expected or not hmac.compare_digest(token, expected):
-        return redirect(url_for("orion_private_login", error="Sessão expirada. Tente novamente."))
-
+    session.setdefault("csrf_token", secrets.token_urlsafe(32))
+    if request.form.get("csrf_token") != session.get("csrf_token"):
+        return render_template_string(LOGIN_TEMPLATE, error="Sess?o expirada. Recarregue e tente novamente.", csrf_token=session["csrf_token"]), 400
     if not private_credentials_ready():
-        return redirect(url_for("orion_private_login", error="Login privado ainda não foi configurado."))
-
-    username = request.form.get("username", "").strip()
-    password = request.form.get("password", "")
+        return render_template_string(LOGIN_TEMPLATE, error="Login privado ainda n?o configurado no servidor.", csrf_token=session["csrf_token"]), 503
+    username = (request.form.get("username") or "").strip()
+    password = request.form.get("password") or ""
     valid_user = hmac.compare_digest(username, os.getenv("ORION_USERNAME", ""))
     valid_password = hmac.compare_digest(password, os.getenv("ORION_PASSWORD", ""))
     if not (valid_user and valid_password):
-        return redirect(url_for("orion_private_login", error="Usuário ou senha incorretos."))
-
-    user = private_user()
-    session["private_user"] = user
-    session["user"] = user
-    session["csrf_token"] = secrets.token_urlsafe(32)
+        return render_template_string(LOGIN_TEMPLATE, error="Usu?rio ou senha inv?lidos.", csrf_token=session["csrf_token"]), 401
+    session["private_user"] = private_user()
+    session["user"] = private_user()
     return redirect(url_for("index"))
 
 
-try:
-    from math_service import answer_math
-    original_ask_ai_response = module.ask_ai_response
-
-    def ask_ai_response_with_math(message, context):
-        reply = answer_math(message)
-        if reply:
-            return reply, "math"
-        return original_ask_ai_response(message, context)
-
-    module.ask_ai_response = ask_ai_response_with_math
-except Exception:
-    pass
-
-
-@app.after_request
-def orion_v111_patch(response):
-    content_type = response.headers.get("Content-Type", "")
-    if request.endpoint == "index" and "text/html" in content_type:
-        html = response.get_data(as_text=True)
-        html = html.replace("ORION V1.1", "ORION LEGACY")
-        html = html.replace("V1.1 Foundation", "Legacy Edition")
-        html = html.replace("Interface V1.1 carregada", "Interface Legacy carregada")
-        html = html.replace("<title>ORION V1.1</title>", "<title>ORION LEGACY</title>")
-        style = """
-        <style id="orion-legacy-logo-patch">
-          .logo { display: inline-block; width: 34px; height: 34px; flex: 0 0 auto; border: 1px solid rgba(0, 229, 255, 0.72); border-radius: 50%; background: url('/static/icon-192.png') center / cover no-repeat, rgba(13, 17, 23, 0.72); box-shadow: 0 0 18px rgba(0, 229, 255, 0.32); }
-          .logo.large { width: 48px; height: 48px; }
-        </style>
-        """
-        script = """
-        <script id="orion-legacy-ui-patch">
-          window.addEventListener('load', function () {
-            var kicker = document.getElementById('view-kicker');
-            if (kicker) kicker.textContent = 'ORION LEGACY ONLINE';
-            document.title = 'ORION LEGACY';
-          });
-        </script>
-        """
-        if "orion-legacy-logo-patch" not in html:
-            html = html.replace("</head>", f"{style}</head>")
-        if "orion-legacy-ui-patch" not in html:
-            html = html.replace("</body>", f"{script}</body>")
-        response.set_data(html)
-        response.headers["Content-Length"] = str(len(response.get_data()))
-    return response
+@app.post("/logout")
+def orion_private_logout():
+    session.clear()
+    return jsonify({"status": "ok"})
 
 
 if __name__ == "__main__":
